@@ -1,0 +1,259 @@
+CREATE TABLE Knjige(
+	ISBN TEXT, Ime TEXT, ID_autor TEXT, ID_izdavac TEXT, Godina INT, Zanr TEXT);
+
+INSERT INTO Knjige VALUES(
+	"9789531975766","Baze podataka","0001","001",2014,"obrazovanje");
+INSERT INTO Knjige VALUES(
+	"9789531976008","Softversko inzenjerstvo","0001","001",2016,"obrazovanje");
+INSERT INTO Knjige VALUES(
+	"0009536166119","Prstenova druzina","0002","002",2002,"fantastika");
+INSERT INTO Knjige VALUES(
+	"0009536166118","Dvije kule","0002","002",2002,"fantastika");
+INSERT INTO Knjige VALUES(
+	"0009536166135","Povratak kralja","0002","002",2002,"fantastika");
+INSERT INTO Knjige VALUES(
+	"9789532521849","Crveni krug","0003","003",2015,"kriminalistika");
+INSERT INTO Knjige VALUES(
+	"9789531413695","Dnevnik Pauline P.","0004","004",2019,"za mlade");
+INSERT INTO Knjige VALUES(
+	"9789531413480","Gorski dnevnik Pauline P.","0004","004",2012,"za mlade");
+INSERT INTO Knjige VALUES(
+	"0000140620583","Hamlet","0005","005",1994,"drama");
+INSERT INTO Knjige VALUES(
+	"0009530601905","Romeo i Julija","0005","006",2003,"tragedija");
+	
+CREATE TABLE Autori(
+	ID_autor TEXT, Ime TEXT, Prezime TEXT);
+
+INSERT INTO Autori VALUES(
+	"0001","Robert","Manger");
+INSERT INTO Autori VALUES(
+	"0002","John R.R.","Tolkien");
+INSERT INTO Autori VALUES(
+	"0003","Arthur C.","Doyle");	
+INSERT INTO Autori VALUES(
+	"0004","Sanja","Polak");	
+INSERT INTO Autori VALUES(
+	"0005","William","Shakespeare");	
+
+CREATE TABLE Izdavaci(
+	ID_izdavac TEXT, Ime TEXT);
+
+INSERT INTO Izdavaci VALUES(
+	"001","Element");
+INSERT INTO Izdavaci VALUES(
+	"002","Algoritam");
+INSERT INTO Izdavaci VALUES(
+	"003","Zagrebacka naklada");
+INSERT INTO Izdavaci VALUES(
+	"004","Mozaik knjiga");
+INSERT INTO Izdavaci VALUES(
+	"005","Penguin books");
+INSERT INTO Izdavaci VALUES(
+	"006","Skolska knjiga");
+
+CREATE TABLE Suradnja(
+	ID_autor TEXT, ID_izdavac TEXT);
+
+INSERT INTO Suradnja VALUES("0001","001");
+INSERT INTO Suradnja VALUES("0002","002");
+INSERT INTO Suradnja VALUES("0002","004");
+INSERT INTO Suradnja VALUES("0002","005");
+INSERT INTO Suradnja VALUES("0002","006");
+INSERT INTO Suradnja VALUES("0003","003");
+INSERT INTO Suradnja VALUES("0003","005");
+INSERT INTO Suradnja VALUES("0003","006");
+INSERT INTO Suradnja VALUES("0004","003");
+INSERT INTO Suradnja VALUES("0004","004");
+INSERT INTO Suradnja VALUES("0005","002");
+INSERT INTO Suradnja VALUES("0005","004");
+INSERT INTO Suradnja VALUES("0005","005");
+INSERT INTO Suradnja VALUES("0005","006");
+
+CREATE TABLE Cjenik(
+	ISBN TEXT, Cijena_kn INT, Popust TEXT);
+	
+INSERT INTO Cjenik VALUES(
+	"9789531975766",110,"ne");
+INSERT INTO Cjenik VALUES(
+	"9789531976008",144,"ne");
+INSERT INTO Cjenik VALUES(
+	"0009536166119",199,"da");
+INSERT INTO Cjenik VALUES(
+	"0009536166118",199,"da");
+INSERT INTO Cjenik VALUES(
+	"0009536166135",199,"da");
+INSERT INTO Cjenik VALUES(
+	"9789532521849",50,"da");
+INSERT INTO Cjenik VALUES(
+	"9789531413695",79,"ne");
+INSERT INTO Cjenik VALUES(
+	"9789531413480",79,"ne");
+INSERT INTO Cjenik VALUES(
+	"0000140620583",129,"ne");
+INSERT INTO Cjenik VALUES(
+	"0009530601905",129,"da");
+	
+CREATE TABLE Narudzbe(
+	ID INT, ISBN TEXT, Placeno TEXT);
+	
+INSERT INTO Narudzbe VALUES(
+	1,"9789531975766","13/04/2022");
+INSERT INTO Narudzbe VALUES(
+	2,"9789531975766",NULL);
+INSERT INTO Narudzbe VALUES(
+	3,"0009536166135",NULL);
+INSERT INTO Narudzbe VALUES(
+	4,"0009536166135","12/06/2022");
+INSERT INTO Narudzbe VALUES(
+	5,"0009536166135","15/06/2022");
+INSERT INTO Narudzbe VALUES(
+	6,"0000140620583",NULL);
+INSERT INTO Narudzbe VALUES(	
+	7,"0000140620583",NULL);
+
+SELECT Ime, Prezime FROM Autori;
+
+SELECT Autori.Ime, Prezime, Knjige.Ime 
+FROM Autori, Knjige
+WHERE Autori.ID_autor = Knjige.ID_autor AND Godina < 2010;
+
+SELECT Ime FROM Izdavaci WHERE Ime LIKE '%knjiga%';
+
+SELECT Ime, Prezime FROM Autori WHERE NOT EXISTS
+(SELECT * FROM Suradnja
+WHERE Suradnja.ID_autor = Autori.ID_autor AND ID_izdavac = 004);
+
+SELECT Ime FROM Knjige
+WHERE ISBN NOT IN
+(SELECT ISBN FROM Cjenik WHERE Popust = 'da');
+
+SELECT Ime FROM Knjige
+WHERE Godina > ALL
+(SELECT Godina FROM Knjige WHERE Zanr = 'obrazovanje');
+
+SELECT Ime, Godina FROM Knjige ORDER BY Godina ASC, Ime DESC;
+
+SELECT MIN(Cijena_kn), MAX(Cijena_kn), AVG(Cijena_kn) FROM Cjenik;
+
+SELECT Zanr, COUNT(*) AS Broj FROM Knjige GROUP BY Zanr;
+
+SELECT ID_autor, COUNT(ID_autor) AS Suradnji
+FROM Suradnja GROUP BY ID_autor
+HAVING COUNT(ID_autor) > 2;
+
+SELECT ID FROM Narudzbe WHERE Placeno IS NOT NULL;
+
+SELECT ISBN, COUNT(*) FROM Narudzbe GROUP BY ISBN;
+
+SELECT ISBN, COUNT(Placeno) FROM Narudzbe GROUP BY ISBN;
+
+WITH RECURSIVE Fact(n, rez) AS
+	(SELECT 1, 1 UNION
+	 SELECT n+1, (n+1)*rez FROM Fact WHERE n<4)
+SELECT n, rez FROM Fact;
+
+CREATE TABLE Letovi(
+	Od TEXT, Do TEXT);
+	
+INSERT INTO Letovi VALUES(
+	"San Francisco","Denver");
+INSERT INTO Letovi VALUES(
+	"San Francisco","Dallas");
+INSERT INTO Letovi VALUES(
+	"Denver","Chicago");
+INSERT INTO Letovi VALUES(
+	"Denver","Dallas");
+INSERT INTO Letovi VALUES(
+	"Dallas","Chicago");
+INSERT INTO Letovi VALUES(
+	"Dallas","New York");
+INSERT INTO Letovi VALUES(
+	"Chicago","New York");
+
+WITH RECURSIVE Letovi_presjedanje(Od, Do) AS
+	(SELECT Od, Do FROM Letovi UNION
+	 SELECT R1.Od, R2.Do
+	 FROM Letovi_presjedanje R1, Letovi R2 
+	 WHERE R1.Do = R2.Od)
+SELECT * FROM Letovi_presjedanje;
+
+CREATE TABLE RoditeljOd(
+	Roditelj TEXT, Dijete TEXT);
+
+INSERT INTO RoditeljOd VALUES(
+	"Alice","Carol");
+INSERT INTO RoditeljOd VALUES(
+	"Bob","Carol");
+INSERT INTO RoditeljOd VALUES(
+	"Carol","Dave");
+INSERT INTO RoditeljOd VALUES(
+	"Carol","George");
+INSERT INTO RoditeljOd VALUES(
+	"Dave","Mary");
+INSERT INTO RoditeljOd VALUES(
+	"Eve","Mary");
+INSERT INTO RoditeljOd VALUES(
+	"Mary","Frank");
+
+WITH RECURSIVE Predak AS
+	(SELECT Roditelj AS predak_roditelj FROM RoditeljOd
+	 WHERE Dijete = 'Frank' UNION
+	 SELECT Roditelj FROM Predak, RoditeljOd
+	 WHERE Predak.predak_roditelj = RoditeljOd.Dijete)
+SELECT * FROM Predak;
+
+CREATE TABLE Glavnice(
+	ID INT, Iznos_glavnice DECIMAL(10));
+	
+INSERT INTO Glavnice VALUES(
+	0, 100000);
+INSERT INTO Glavnice VALUES(
+	1, 300000);	
+INSERT INTO Glavnice VALUES(
+	2, 500000);
+
+WITH RECURSIVE Kamatni_racun AS
+	(SELECT 5 AS Godine, 0 AS Iznos_glavnice, 0 AS Na_racunu
+	 UNION
+	 SELECT Godine+1, Glavnice.Iznos_glavnice,
+	 ROUND(Glavnice.Iznos_glavnice * POWER(1.03,Godine+1),2)
+	 AS Na_racunu
+	 FROM Glavnice, Kamatni_racun WHERE Godine < 10)
+SELECT *, Na_racunu - Iznos_glavnice AS Kamate
+FROM Kamatni_racun ORDER BY Na_racunu;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
